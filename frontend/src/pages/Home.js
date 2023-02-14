@@ -7,7 +7,7 @@ import Loader from "../assets/loading.svg";
 import ProfileCard from "../components/ProfileCard";
 
 import io from "socket.io-client";
-const ENDPOINT = process.env.REACT_APP_SOCKET_ENDPOINT;
+const ENDPOINT = "https://dating-hub-mern.onrender.com";
 let socket;
 
 export default function Home() {
