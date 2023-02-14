@@ -7,6 +7,7 @@ const initialState = {
   status: "IDLE",
   errorMessage: null,
   allUserProfiles: null,
+  notifications: [],
 };
 export const userSlice = createSlice({
   name: "user",
@@ -15,6 +16,17 @@ export const userSlice = createSlice({
     clearErrors: (state) => {
       state.statusMessage = null;
       state.status = "IDLE";
+    },
+    setNotifications: (state, action) => {
+      const isAvailable = state.notifications?.findIndex(
+        (notif) => notif.senderUser._id === action.payload.senderUser._id
+      );
+
+      if (isAvailable > -1) return;
+
+      if (isAvailable === -1) {
+        state.notifications.push(action.payload);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -136,6 +148,6 @@ export const getUserProfiles = createAsyncThunk(
   }
 );
 
-export const { clearErrors } = userSlice.actions;
+export const { clearErrors, setNotifications } = userSlice.actions;
 
 export default userSlice.reducer;

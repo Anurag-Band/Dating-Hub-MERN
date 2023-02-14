@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { ErrorToast, SuccessToast } from "../utils/CustomToast";
 
-export default function ProfileCard({ prof }) {
+export default function ProfileCard({ prof, socket }) {
   const { user } = useSelector((state) => state.user);
 
   const [hasLiked, setHasLiked] = useState(false);
@@ -22,6 +22,7 @@ export default function ProfileCard({ prof }) {
 
       if (data.isLiked) {
         setHasLiked(true);
+        socket.emit("liked", data);
         SuccessToast(data.message);
       } else {
         setHasLiked(false);
@@ -38,6 +39,7 @@ export default function ProfileCard({ prof }) {
 
       if (data.isSuperLiked) {
         setHasSuperLiked(true);
+        socket.emit("super liked", data);
         SuccessToast(data.message);
       } else {
         setHasSuperLiked(false);
@@ -70,7 +72,7 @@ export default function ProfileCard({ prof }) {
     setBlocked(prof?.blockedBy.includes(user?._id));
 
     // eslint-disable-next-line
-  }, [user]);
+  }, []);
 
   return (
     <Card

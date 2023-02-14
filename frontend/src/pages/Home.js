@@ -1,18 +1,58 @@
 import { Box, Container, CssBaseline } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
-import { getUserProfiles } from "../features/user/userSlice";
+import { getUserProfiles, setNotifications } from "../features/user/userSlice";
 import Loader from "../assets/loading.svg";
 import ProfileCard from "../components/ProfileCard";
 
+import io from "socket.io-client";
+const ENDPOINT = "http://localhost:3770";
+let socket;
+
 export default function Home() {
   const dispatch = useDispatch();
-  const { allUserProfiles, status } = useSelector((state) => state.user);
+  const { allUserProfiles, status, user, notifications } = useSelector(
+    (state) => state.user
+  );
+
+  const [isJoined, setIsJoined] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    socket = io(ENDPOINT);
+    if (user && !isJoined) {
+      socket.emit("setup", user);
+      socket.on("connected", () => setSocketConnected(true));
+      socket.emit("join session", user._id);
+      setIsJoined(true);
+    }
+
+    // eslint-disable-next-line
+  }, [user]);
 
   useEffect(() => {
     dispatch(getUserProfiles());
   }, [dispatch]);
+
+  useEffect(() => {
+    socket.on("like recieved", (newLikeRecieved) => {
+      dispatch(setNotifications(newLikeRecieved));
+    });
+  });
+
+  useEffect(() => {
+    socket.on("super like recieved", (newSuperLikeRecieved) => {
+      const findIndex = notifications?.findIndex(
+        (notif) =>
+          notif.receiverUser._id === newSuperLikeRecieved.receiverUser._id
+      );
+      if (findIndex === -1) {
+        dispatch(setNotifications(newSuperLikeRecieved));
+      }
+    });
+  });
 
   return (
     <Container
@@ -36,7 +76,7 @@ export default function Home() {
       >
         {status === "LOADING" && <img src={Loader} alt='Loading...' />}
         {allUserProfiles?.map((prof) => (
-          <ProfileCard key={prof._id} prof={prof} />
+          <ProfileCard key={prof._id} prof={prof} socket={socket} />
         ))}
       </Box>
     </Container>

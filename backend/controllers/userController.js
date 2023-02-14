@@ -95,10 +95,17 @@ exports.likeUser = catchAsync(async (req, res, next) => {
 
     await user.save();
 
+    const notifData = {
+      type: "Liked",
+      senderUser: req.user,
+      receiverUser: user,
+    };
+
     return res.status(200).json({
       success: true,
       message: "Profile Liked!",
       isLiked: true,
+      notifData,
     });
   }
 });
@@ -127,10 +134,17 @@ exports.superLikeUser = catchAsync(async (req, res, next) => {
 
     await user.save();
 
+    const notifData = {
+      type: "Super Liked",
+      senderUser: req.user,
+      receiverUser: user,
+    };
+
     return res.status(200).json({
       success: true,
       message: "Profile Super Liked!",
       isSuperLiked: true,
+      notifData,
     });
   }
 });

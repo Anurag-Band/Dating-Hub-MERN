@@ -10,66 +10,46 @@ const server = app.listen(PORT, () => {
 
 // ============= socket.io ==============
 
-// const io = require("socket.io")(server, {
-//     // pingTimeout: 60000,
-//     cors: {
-//         origin: "http://localhost:3440",
-//     }
-// });
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "http://localhost:3440",
+  },
+});
 
-// let users = [];
+io.on("connection", (socket) => {
+  console.log("Connected to socket.io");
+  socket.on("setup", (userData) => {
+    socket.join(userData._id);
+    socket.emit("connected");
+  });
 
-// const addUser = (userId, socketId) => {
-//     !users.some((user) => user.userId === userId) &&
-//         users.push({ userId, socketId });
-// }
+  socket.on("join session", (room) => {
+    socket.join(room);
+    console.log("User Joined Room: " + room);
+  });
 
-// const removeUser = (socketId) => {
-//     users = users.filter((user) => user.socketId !== socketId);
-// }
+  // for like
+  socket.on("liked", (data) => {
+    const like = data.notifData.receiverUser._id;
 
-// const getUser = (userId) => {
-//     return users.find((user) => user.userId === userId);
-// }
+    if (!like) return console.log("like not defined");
 
-// io.on("connection", (socket) => {
-//     console.log("🚀 Someone connected!");
-//     // console.log(users);
+    socket.in(like).emit("like recieved", data.notifData);
+  });
 
-//     // get userId and socketId from client
-//     socket.on("addUser", (userId) => {
-//         addUser(userId, socket.id);
-//         io.emit("getUsers", users);
-//     });
+  // for super like ->
+  socket.on("super liked", (data) => {
+    const superLike = data.notifData.receiverUser._id;
 
-//     // get and send message
-//     socket.on("sendMessage", ({ senderId, receiverId, content }) => {
+    if (!superLike) return console.log("superLike not defined");
 
-//         const user = getUser(receiverId);
+    socket.in(superLike).emit("super like recieved", data.notifData);
+  });
 
-//         io.to(user?.socketId).emit("getMessage", {
-//             senderId,
-//             content,
-//         });
-//     });
+  socket.off("setup", () => {
+    console.log("USER DISCONNECTED");
+    socket.leave(userData._id);
+  });
+});
 
-//     // typing states
-//     socket.on("typing", ({ senderId, receiverId }) => {
-//         const user = getUser(receiverId);
-//         console.log(user)
-//         io.to(user?.socketId).emit("typing", senderId);
-//     });
-
-//     socket.on("typing stop", ({ senderId, receiverId }) => {
-//         const user = getUser(receiverId);
-//         io.to(user?.socketId).emit("typing stop", senderId);
-//     });
-
-//     // user disconnected
-//     socket.on("disconnect", () => {
-//         console.log("⚠️ Someone disconnected")
-//         removeUser(socket.id);
-//         io.emit("getUsers", users);
-//         // console.log(users);
-//     });
-// });
