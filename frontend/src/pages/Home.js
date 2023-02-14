@@ -20,7 +20,9 @@ export default function Home() {
 
   useEffect(() => {
     if (!user) return;
-    socket = io(ENDPOINT);
+    socket = io(ENDPOINT, {
+      transports: ["websocket"],
+    });
     if (user && !isJoined) {
       socket.emit("setup", user);
       socket.on("connected", () => setSocketConnected(true));
