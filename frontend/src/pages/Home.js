@@ -7,7 +7,7 @@ import Loader from "../assets/loading.svg";
 import ProfileCard from "../components/ProfileCard";
 
 import io from "socket.io-client";
-const ENDPOINT = "http://localhost:3770";
+const ENDPOINT = process.env.REACT_APP_SOCKET_ENDPOINT;
 let socket;
 
 export default function Home() {

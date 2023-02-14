@@ -13,7 +13,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3440",
+    origin: "http://localhost:3000",
   },
 });
 
@@ -53,3 +53,17 @@ io.on("connection", (socket) => {
   });
 });
 
+// Unhandled Promise Rejection
+process.on("unhandledRejection", (err) => {
+  console.log(`Error: ${err.message}`);
+  console.log(`Shutting down the server due to Unhandled Promise Rejection`);
+  process.exit(1);
+});
+
+// Handling Uncaught Exception
+process.on("uncaughtException", (err) => {
+  console.log(`Error: ${err.message}`);
+  console.log(`Stack: ${err.stack}`);
+  console.log(`Shutting down the server due to Uncaught Exception`);
+  process.exit(1);
+});
