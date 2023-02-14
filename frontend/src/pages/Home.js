@@ -12,11 +12,10 @@ let socket;
 
 export default function Home() {
   const dispatch = useDispatch();
-  const { allUserProfiles, status, user, notifications } = useSelector(
-    (state) => state.user
-  );
+  const { allUserProfiles, status, user } = useSelector((state) => state.user);
 
   const [isJoined, setIsJoined] = useState(false);
+  // eslint-disable-next-line
   const [socketConnected, setSocketConnected] = useState(false);
 
   useEffect(() => {
@@ -44,13 +43,7 @@ export default function Home() {
 
   useEffect(() => {
     socket.on("super like recieved", (newSuperLikeRecieved) => {
-      const findIndex = notifications?.findIndex(
-        (notif) =>
-          notif.receiverUser._id === newSuperLikeRecieved.receiverUser._id
-      );
-      if (findIndex === -1) {
-        dispatch(setNotifications(newSuperLikeRecieved));
-      }
+      dispatch(setNotifications(newSuperLikeRecieved));
     });
   });
 

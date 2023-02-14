@@ -19,7 +19,9 @@ export const userSlice = createSlice({
     },
     setNotifications: (state, action) => {
       const isAvailable = state.notifications?.findIndex(
-        (notif) => notif.senderUser._id === action.payload.senderUser._id
+        (notif) =>
+          notif.senderUser._id === action.payload.senderUser._id &&
+          notif.type === action.payload.type
       );
 
       if (isAvailable > -1) return;

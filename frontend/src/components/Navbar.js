@@ -5,6 +5,7 @@ import {
   MenuItem,
   Toolbar,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState } from "react";
@@ -12,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../features/user/userSlice";
 import Logo from "../assets/Logo.png";
-import { CircleNotifications } from "@mui/icons-material";
+import { CircleNotifications, Favorite } from "@mui/icons-material";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -98,16 +99,58 @@ export default function Navbar() {
                   MenuListProps={{
                     "aria-labelledby": "basic-button",
                   }}
+                  sx={{
+                    gap: 1,
+                  }}
                 >
                   {notifications?.length === 0 && (
                     <MenuItem>No Notifications</MenuItem>
                   )}
                   {notifications?.length > 0 &&
-                    notifications?.map((notif, index) => (
-                      <MenuItem
-                        key={index}
-                      >{`${notif.type} by @${notif.senderUser.username}`}</MenuItem>
-                    ))}
+                    notifications?.map((notif, index) =>
+                      notif.type === "Liked" ? (
+                        <MenuItem
+                          key={index}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                            padding: "11px 15px",
+                          }}
+                        >
+                          <Favorite
+                            sx={{
+                              color: "red",
+                              fontSize: "34px",
+                              margin: "0 9px",
+                            }}
+                          />
+                          <Typography>
+                            {`${notif.type} by @${notif.senderUser.username}`}
+                          </Typography>
+                        </MenuItem>
+                      ) : (
+                        <MenuItem
+                          key={index}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                          }}
+                        >
+                          <img
+                            src={notif?.senderUser?.profilePic}
+                            alt={notif?.senderUser?.username}
+                            style={{
+                              width: "3rem",
+                            }}
+                          />
+                          <Typography>
+                            {`${notif.type} by @${notif.senderUser.username}`}
+                          </Typography>
+                        </MenuItem>
+                      )
+                    )}
                 </Menu>
               </Box>
             )}
