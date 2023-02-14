@@ -56,7 +56,10 @@ export const userSlice = createSlice({
       // for get all user profiles ->>
       .addCase(getUserProfiles.fulfilled, (state, action) => {
         state.status = "IDLE";
-        state.allUserProfiles = action.payload.users;
+        const allUsers = action.payload.users.filter(
+          (user) => user._id !== state.user._id
+        );
+        state.allUserProfiles = allUsers;
       })
       .addCase(getUserProfiles.rejected, (state, action) => {
         state.errorMessage = action.payload;

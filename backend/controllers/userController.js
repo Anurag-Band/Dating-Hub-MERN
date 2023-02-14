@@ -222,11 +222,6 @@ exports.allUser = catchAsync(async (req, res, next) => {
   users.forEach((prof, index) => {
     const ids = prof.blocked.map((id) => id.toHexString());
 
-    if (prof._id.toHexString() === req.user._id.toHexString()) {
-      users.splice(index, 1);
-      return;
-    }
-
     if (ids.includes(currentUser)) {
       users.splice(index, 1);
     } else {
